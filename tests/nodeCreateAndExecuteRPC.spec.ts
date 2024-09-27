@@ -1,9 +1,9 @@
 import { test, expect } from "@playwright/test";
 import { getEnvVar, setEnvVar } from "../utils/env";
 import { rpcETHMethod } from "../utils/rpcUtils";
-import exp from "constants";
-
+import {setTokenToLocalStorage} from "../utils/authTokenUtils"
 require("dotenv").config();
+test.describe.configure({ mode: 'serial' });
 
 const nodeURL = `https://site1.moralis-nodes.com/eth/${getEnvVar("NODE_KEY")}`;
 // This test is failing on my side because I do not have test account that is setup to disable Captcha
@@ -37,24 +37,10 @@ test.skip("login to admin page", async ({ page }) => {
     headerLocator.filter({ hasText: `Welcome ${userFullName}` })
   ).toBeVisible();
 });
-
+// Login directly by injecting auth token to local storage 
 test("click on nodes nav button and create new ETH node", async ({ page }) => {
   await page.goto("/");
-  // Define the authStore object
-  const authStore = {
-    state: {
-      hasMarketingSubscribe: false,
-      hasTermsAndConditions: true,
-      token: getEnvVar("AUTH_TOKEN"), // somehow it is not wokring and I am for now using direct AUTH token
-      keepLoggedIn: false,
-    },
-    version: 0,
-  };
-  // Set the authStore into localStorage
-  await page.evaluate((authStore) => {
-    localStorage.setItem("authStore", JSON.stringify(authStore));
-  }, authStore);
-
+  await setTokenToLocalStorage(page)
   await page.goto("/nodes");
   await page.waitForSelector("#main_top");
   await page.getByRole("button", { name: "Create a New Node" }).click();
@@ -149,4 +135,12 @@ test('negative scenario: wrong method', async()=> {
 test('negative scenario: wrong param', async()=> {
   const response = await rpcETHMethod(nodeURL, "eth_getTransactionByHash", [11])
   expect(response.error.message === "Invalid params")  
+})
+
+test('delete node and try rpc with deleted key', async({page})=> {
+  await page.goto("/");
+  await setTokenToLocalStorage(page)
+  await page.goto("/nodes");
+  await page.waitForSelector("#main_top");
+
 })

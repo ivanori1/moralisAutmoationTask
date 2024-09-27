@@ -1,5 +1,3 @@
-// rpcUtils.ts
-
 export async function rpcETHMethod(
   nodeURL: string,
   method: string,
