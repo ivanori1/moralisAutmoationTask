@@ -1,5 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { getEnvVar,setEnvVar } from "../utils/env";
+import { rpcETHMethod } from '../utils/rpcUtils';
+
 require('dotenv').config();
 
 const nodeURL = `https://site1.moralis-nodes.com/eth/${getEnvVar('NODE_KEY')}`
@@ -54,6 +56,7 @@ test.skip("login to admin page", async ({ page }) => {
    }, authStore);
   
    await page.goto('/nodes')
+   await page.waitForSelector("#main_top");
    await page.getByRole("button", { name: "Create a New Node" }).click();
    await expect(page.locator(".mui-modal")).toBeVisible();
    await page.getByRole("heading", { name: "Start creating your node" }).isVisible()
@@ -77,22 +80,36 @@ test.skip("login to admin page", async ({ page }) => {
   setEnvVar('NODE_KEY', response.key)
   })
 
-  test("use created node key and execute RPC blockNumber", async()=> {
-    const blockNumberRequest = await fetch(nodeURL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        jsonrpc: "2.0",
-        method: "eth_blockNumber",
-        params: [],
-        id: 1
-      })
-    });
-    const blockNumberResponse = await blockNumberRequest.json();
-    expect(blockNumberResponse).toEqual(expect.objectContaining({
+  
+
+  test("positive scenario for RPC blockNumber", async()=> {
+    const response = await rpcETHMethod(nodeURL,"eth_blockNumber")
+    expect(response).toEqual(expect.objectContaining({
       jsonrpc: '2.0',
       id:1,
-      result: expect.any(String)
+      result: expect.stringContaining('0x')
     }))
-    console.log(blockNumberResponse)
+    console.log(response.result)
+  })
+
+  test('postivie scenario for RPC getBlockByNumber (latest block) full transaction object', async()=> {
+    // Fetch latest block from eth_blockNumber result 
+    const responseBlockNumber = await rpcETHMethod(nodeURL, "eth_blockNumber", [])
+  // Call getBlockByNumber from latest block with full transaction object
+  const responseGetBlock = await rpcETHMethod(nodeURL, "eth_getBlockByNumber", [responseBlockNumber.result, true])
+  expect(typeof responseGetBlock.result.transactions[0] === 'object')
+  expect(responseGetBlock.result.transactions[0]).toEqual(expect.objectContaining({      
+        from: expect.any(String),
+        to: expect.any(String)
+
+    }))
+  })
+  test('postivie scenario for RPC getBlockByNumber (latest block) only hashes of  transaction ', async()=> {
+    // Fetch latest block from eth_blockNumber result 
+    const responseBlockNumber = await rpcETHMethod(nodeURL, "eth_blockNumber", [])
+  // Call getBlockByNumber from latest block with full transaction object
+  const responseGetBlock = await rpcETHMethod(nodeURL, "eth_getBlockByNumber", [responseBlockNumber.result, false])
+  console.log(responseGetBlock.result.transactions[0])  
+  
+  expect(typeof responseGetBlock.result.transactions[0] === 'string')
   })
