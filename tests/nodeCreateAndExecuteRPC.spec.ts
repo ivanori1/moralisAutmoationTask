@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { getEnvVar, setEnvVar } from "../utils/env";
 import { rpcETHMethod } from "../utils/rpcUtils";
+import exp from "constants";
 
 require("dotenv").config();
 
@@ -135,3 +136,12 @@ test("postivie scenario for RPC getBlockByNumber (latest block) full transaction
     })
   );
 });
+
+test('negative scenario: wrong method', async()=> {
+  const notEthMethod = "notEthMethod"
+  const response = await rpcETHMethod(nodeURL, notEthMethod)
+  expect(response).toEqual(expect.objectContaining({
+    code: 400,
+    message: `'${notEthMethod}' is not supported on chain eth`
+  }))
+})
