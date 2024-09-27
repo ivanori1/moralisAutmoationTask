@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { getEnvVar,setEnvVar } from "../utils/env";
+require('dotenv').config();
 
 // This test is failing on my side because I do not have test account that is setup to disable Captcha
 test.skip("login to admin page", async ({ page }) => {
@@ -40,7 +41,7 @@ test.skip("login to admin page", async ({ page }) => {
       state: {
           hasMarketingSubscribe: false,
           hasTermsAndConditions: true,
-          token:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uSWQiOiI1NzlkMzU4My1jYmFlLTQ2NjEtOTZjNS02ZDA5YjViNjQzYjkiLCJlbWFpbCI6ImNvcmljLml2YW5AeWFuZGV4LmNvbSIsInVzZXJJZCI6NDIwNjQ5LCJvcmdJZCI6NDA5MzQ4LCJvcmdSb2xlSWQiOjEsInByb2plY3RJZCI6Ijk4NGY1NzZkLTIwM2QtNDAwMy04MmIwLTVkNjA3MjRmNTA1OSIsImtlZXBtZUxvZ2dlZGluIjpmYWxzZSwiaXMyRkFFbmFibGVkIjpmYWxzZSwiZW1haWxfdmFsaWRhdGVkIjoxLCJoYXNBY2NlcHRlZFRlcm1zIjoxLCJpc1Bob25lVmVyaWZpZWQiOjIsInJvbGVzIjpbXSwiaWF0IjoxNzI3NDQ2Nzc1LCJleHAiOjE3Mjc0NTAzNzV9.dYy_wLLZp10mocRgQX8HiqlUYyh5NOPTC2Tz3OXAAVI",
+          token: getEnvVar('AUTH_TOKEN'), // somehow it is not wokring and I am for now using direct AUTH token 
           keepLoggedIn: false
       },
       version: 0
