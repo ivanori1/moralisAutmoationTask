@@ -145,3 +145,8 @@ test('negative scenario: wrong method', async()=> {
     message: `'${notEthMethod}' is not supported on chain eth`
   }))
 })
+
+test('negative scenario: wrong param', async()=> {
+  const response = await rpcETHMethod(nodeURL, "eth_getTransactionByHash", [11])
+  expect(response.error.message === "Invalid params")  
+})
