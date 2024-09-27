@@ -2,6 +2,7 @@ import { test, expect } from "@playwright/test";
 import { getEnvVar,setEnvVar } from "../utils/env";
 require('dotenv').config();
 
+const nodeURL = `https://site1.moralis-nodes.com/eth/${getEnvVar('NODE_KEY')}`
 // This test is failing on my side because I do not have test account that is setup to disable Captcha
 test.skip("login to admin page", async ({ page }) => {
     await page.goto("/");
@@ -74,4 +75,24 @@ test.skip("login to admin page", async ({ page }) => {
   const response = await responsePromise.json();
   // Write node key to .env file 
   setEnvVar('NODE_KEY', response.key)
+  })
+
+  test("use created node key and execute RPC blockNumber", async()=> {
+    const blockNumberRequest = await fetch(nodeURL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        method: "eth_blockNumber",
+        params: [],
+        id: 1
+      })
+    });
+    const blockNumberResponse = await blockNumberRequest.json();
+    expect(blockNumberResponse).toEqual(expect.objectContaining({
+      jsonrpc: '2.0',
+      id:1,
+      result: expect.any(String)
+    }))
+    console.log(blockNumberResponse)
   })
