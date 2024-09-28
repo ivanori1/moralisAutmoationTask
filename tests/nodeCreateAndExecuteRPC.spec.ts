@@ -111,7 +111,7 @@ test("positive scenario for blockNumber, getBlockByNumber, getTransactionByHash"
   });
 
 
-test("postivie scenario for RPC getBlockByNumber (latest block) full transaction object", async () => {
+test("positive scenario for RPC getBlockByNumber (latest block) full transaction object", async () => {
   // Fetch latest block from eth_blockNumber result
   const responseBlockNumber = await rpcETHMethod(
     nodeURL,
