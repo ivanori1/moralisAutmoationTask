@@ -142,5 +142,31 @@ test('delete node and try rpc with deleted key', async({page})=> {
   await setTokenToLocalStorage(page)
   await page.goto("/nodes");
   await page.waitForSelector("#main_top");
+  // Function to delete all items
+  async function deleteAllNodes() {
+    while (true) {
+      // Get all accordion buttons
+      const accordions = await page.$$('[data-style="accordion-button"]');
+      // Break the loop if there are no accordion buttons
+      if (accordions.length === 0) break;
+
+      // Click on the first accordion button to expand it
+      await accordions[0].click();
+
+      // Wait for the delete button to be visible and click it
+      const deleteButton = await page.$('#main_top [data-testid="mui-button-outline"]');
+      await deleteButton?.click();
+
+      // Wait for the modal confirmation button and click it
+      const confirmButton = await page.$('[data-testid="mui-button-destructive"]');
+      await confirmButton?.click();
+    }
+  }
+
+  // Call the function to delete all nodes
+  await deleteAllNodes();
+
+  // Check that the "You don’t have any Nodes yet" text is displayed
+  await expect(page.locator('text="You don’t have any Nodes yet"')).toBeVisible();
 
 })
