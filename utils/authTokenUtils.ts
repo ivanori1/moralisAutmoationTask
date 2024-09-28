@@ -11,7 +11,6 @@ export async function setTokenToLocalStorage(page: Page) {
       },
       version: 0,
   };
-console.log(authStore.state.token)
   await page.evaluate((authStore) => {
     localStorage.setItem("authStore", JSON.stringify(authStore));
   }, authStore);
