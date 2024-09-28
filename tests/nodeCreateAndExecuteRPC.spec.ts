@@ -18,6 +18,15 @@ test.skip("login to admin page", async ({ page }) => {
 
   // Click the login button.
   await page.getByRole("button", { name: "Log in" }).click();
+  const responseLogin = await page.waitForResponse((response)=> {
+    return (
+      response.url().includes("https://api.dashboard.moralis.io/auth/login") &&
+      response.status() === 201
+    );
+  })
+  const loginResponseBody = await responseLogin.json()
+    // Write auth token to .env file
+    setEnvVar("AUTH_TOKEN", loginResponseBody.access_token);
 
   await page.waitForSelector("#main_top");
   const responsePromise = await page.waitForResponse((response) => {
