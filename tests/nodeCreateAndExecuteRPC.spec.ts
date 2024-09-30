@@ -78,7 +78,7 @@ test("click on nodes nav button and create new ETH node", async ({ page }) => {
 });
 
 test("positive scenario for blockNumber, getBlockByNumber, getTransactionByHash", async () => {
-  // blockNumber with checking basic sctructure of ETH JSON-RPC API
+  // blockNumber with checking basic structure of ETH JSON-RPC API
   const responseBlockNumber = await rpcETHMethod(nodeURL, "eth_blockNumber");
   expect(responseBlockNumber).toEqual(
     expect.objectContaining({
@@ -99,9 +99,9 @@ test("positive scenario for blockNumber, getBlockByNumber, getTransactionByHash"
   const txHash = responseGetBlock.result.transactions[0];
   expect(typeof responseGetBlock.result.transactions[0] === "string");
     // getTransactionByHash
-    const responsegetTransaction = await rpcETHMethod(nodeURL, "eth_getTransactionByHash", [txHash]);
+    const responseGetTransaction = await rpcETHMethod(nodeURL, "eth_getTransactionByHash", [txHash]);
     // Verify that block number and hash are matching to previous requests, and that object contains from and to keys 
-    expect(responsegetTransaction.result).toEqual(
+    expect(responseGetTransaction.result).toEqual(
       expect.objectContaining({
         hash: txHash,
         blockHash: blockHash,
